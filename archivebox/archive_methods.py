@@ -573,7 +573,7 @@ def archive_dot_org(link_dir, link, timeout=TIMEOUT):
         result = run(cmd, stdout=PIPE, stderr=DEVNULL, cwd=link_dir, timeout=timeout)
         content_location, errors = parse_archive_dot_org_response(result.stdout)
         if content_location:
-            archive_org_url = 'https://web.archive.org{}'.format(content_location[0])
+            archive_org_url = content_location[0]
         elif len(errors) == 1 and 'RobotAccessControlException' in errors[0]:
             archive_org_url = None
             # raise ArchiveError('Archive.org denied by {}/robots.txt'.format(domain(link['url'])))
@@ -618,6 +618,6 @@ def parse_archive_dot_org_response(response):
         headers[name.lower().strip()].append(val.strip())
 
     # Get successful archive url in "content-location" header or any errors
-    content_location = headers['content-location']
+    content_location = headers.get('content-location', headers['location'])
     errors = headers['x-archive-wayback-runtime-error']
     return content_location, errors
